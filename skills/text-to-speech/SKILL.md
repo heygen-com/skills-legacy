@@ -1,7 +1,7 @@
 ---
 name: text-to-speech
 description: |
-  Generate speech audio from text using HeyGen's Starfish TTS model. Use when: (1) Generating standalone speech audio files from text, (2) Converting text to speech with voice selection, speed, pitch, and emotion control, (3) Creating audio for voiceovers, narration, or podcasts, (4) Working with HeyGen's /v1/audio endpoints, (5) Listing available TTS voices by language or gender.
+  Generate speech audio from text using HeyGen's Starfish TTS model. Use when: (1) Generating standalone speech audio files from text, (2) Converting text to speech with voice selection, speed, and pitch control, (3) Creating audio for voiceovers, narration, or podcasts, (4) Working with HeyGen's /v1/audio endpoints, (5) Listing available TTS voices by language or gender.
 allowed-tools: mcp__heygen__*
 metadata:
   openclaw:
@@ -146,7 +146,6 @@ Convert text to speech audio using a specified voice.
 | `voice_id` | string | Y | Voice ID from `GET /v1/audio/voices` |
 | `speed` | number | | Speech speed, 0.5-1.5 (default: 1) |
 | `pitch` | integer | | Voice pitch, -50 to 50 (default: 0) |
-| `emotion` | string | | Tone: `"Excited"`, `"Friendly"`, `"Serious"`, `"Soothing"`, or `"Broadcaster"` |
 | `locale` | string | | Accent/locale for multilingual voices (e.g., `en-US`, `pt-BR`) |
 | `elevenlabs_settings` | object | | Advanced settings for ElevenLabs voices |
 
@@ -180,7 +179,6 @@ interface TTSRequest {
   voice_id: string;
   speed?: number;
   pitch?: number;
-  emotion?: "Excited" | "Friendly" | "Serious" | "Soothing" | "Broadcaster";
   locale?: string;
   elevenlabs_settings?: {
     model?: string;
@@ -240,7 +238,6 @@ def text_to_speech(
     voice_id: str,
     speed: float = 1.0,
     pitch: int = 0,
-    emotion: str | None = None,
     locale: str | None = None,
 ) -> dict:
     payload = {
@@ -250,8 +247,6 @@ def text_to_speech(
         "pitch": pitch,
     }
 
-    if emotion:
-        payload["emotion"] = emotion
     if locale:
         payload["locale"] = locale
 
@@ -304,14 +299,13 @@ console.log(`Audio URL: ${result.audio_url}`);
 console.log(`Duration: ${result.duration}s`);
 ```
 
-### With Emotion and Speed
+### With Speed Adjustment
 
 ```typescript
 const result = await textToSpeech({
   text: "We're thrilled to announce our newest feature!",
   voice_id: "YOUR_VOICE_ID",
   speed: 1.1,
-  emotion: "Excited",
 });
 ```
 
