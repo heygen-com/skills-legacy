@@ -4,10 +4,49 @@ A collection of skills for working with the HeyGen AI video creation API, design
 
 ## Skills
 
+### Video Creation
+
 | Skill | Description |
 |-------|-------------|
 | [heygen](skills/heygen) | Create AI avatar videos with Video Agent or precise v2 API control. Covers avatars, voices, backgrounds, captions, prompts, and Remotion integration |
+| [avatar-video](skills/avatar-video) | Generate an AI avatar talking-head video driven by audio via the Node Gateway |
+
+### Audio & Speech
+
+| Skill | Description |
+|-------|-------------|
 | [text-to-speech](skills/text-to-speech) | Generate standalone speech audio from text using HeyGen's Starfish TTS model with voice, speed, pitch, and emotion control |
+| [speech-to-text](skills/speech-to-text) | Transcribe audio or video to text with word-level timestamps via the Node Gateway |
+| [speech-to-speech](skills/speech-to-speech) | Convert speech audio to another voice while preserving content and timing via the Node Gateway |
+
+### Video Editing
+
+| Skill | Description |
+|-------|-------------|
+| [trim-video](skills/trim-video) | Trim a video by time range (start, end, duration) via the Node Gateway |
+| [concat-video](skills/concat-video) | Concatenate multiple videos into one with horizontal or vertical orientation via the Node Gateway |
+| [save-video](skills/save-video) | Save a processed video to your HeyGen library with a permanent video ID via the Node Gateway |
+
+### Content Generation
+
+| Skill | Description |
+|-------|-------------|
+| [llm](skills/llm) | Generate text using an LLM with prompts and template variables via the Node Gateway |
+| [script-generator](skills/script-generator) | Generate podcast or video scripts from markdown content via the Node Gateway |
+| [generate-image](skills/generate-image) | Generate images from text prompts with optional reference images via the Node Gateway |
+
+### Content Processing
+
+| Skill | Description |
+|-------|-------------|
+| [website-extraction](skills/website-extraction) | Extract text content from a web page URL via the Node Gateway |
+| [pdf-extraction](skills/pdf-extraction) | Extract text content from a PDF document URL via the Node Gateway |
+| [content-moderation](skills/content-moderation) | Check text, image, audio, or video against moderation policies via the Node Gateway |
+
+### Translation
+
+| Skill | Description |
+|-------|-------------|
 | [video-translate](skills/video-translate) | Translate and dub existing videos into 12+ languages with lip-sync, voice cloning, and multi-speaker support |
 
 ## Installation
@@ -70,8 +109,20 @@ The skills should appear when Claude Code loads. You can verify by asking Claude
 | Generate video from a prompt | `heygen` |
 | Generate video with precise scene control | `heygen` |
 | List avatars and voices | `heygen` |
+| Create avatar talking-head video from audio | `avatar-video` |
 | Generate speech audio from text | `text-to-speech` |
 | List TTS voices | `text-to-speech` |
+| Transcribe audio/video to text | `speech-to-text` |
+| Convert speech to a different voice | `speech-to-speech` |
+| Trim a video to a time range | `trim-video` |
+| Concatenate multiple videos | `concat-video` |
+| Save a video to your library | `save-video` |
+| Generate text with an LLM | `llm` |
+| Generate a script from markdown | `script-generator` |
+| Generate images from a text prompt | `generate-image` |
+| Extract text from a website | `website-extraction` |
+| Extract text from a PDF | `pdf-extraction` |
+| Check content against moderation policies | `content-moderation` |
 | Translate/dub an existing video | `video-translate` |
 | Batch translate to multiple languages | `video-translate` |
 
@@ -84,9 +135,15 @@ The skills should appear when Claude Code loads. You can verify by asking Claude
 
 "Translate this YouTube video to Spanish and French"
 
-"Help me list available HeyGen avatars and pick one for my video"
+"Trim this video to the first 30 seconds"
 
-"Use the prompt optimizer to create a scene-by-scene script"
+"Extract the text from this PDF and generate a podcast script"
+
+"Transcribe this audio file and give me the timestamps"
+
+"Generate an image of a futuristic office with natural lighting"
+
+"Check this script for content policy compliance before generating a video"
 ```
 
 ## API Reference
@@ -108,6 +165,8 @@ All skills use the HeyGen API:
 | `POST /v1/audio/text_to_speech` | text-to-speech | Generate speech audio |
 | `GET /v1/audio/voices` | text-to-speech | List TTS-compatible voices |
 | `POST /v2/video_translate` | video-translate | Start video translation |
+| `POST /v1/node/execute` | all node gateway skills | Execute any node (trim, concat, LLM, ASR, etc.) |
+| `GET /v1/node/status` | all node gateway skills | Check node execution status |
 
 ## Requirements
 

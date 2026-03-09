@@ -49,3 +49,111 @@ jobs:
             --version 2.${{ github.run_number }}.0 \
             --tags latest,translation,dubbing,heygen,video-translate,localization,lip-sync \
             --changelog "Auto-publish from commit ${{ github.sha }}"
+
+      - name: Publish trim-video skill
+        run: |
+          clawhub publish ./skills/trim-video \
+            --slug trim-video \
+            --name "Trim Video" \
+            --version 2.${{ github.run_number }}.0 \
+            --tags latest,video,heygen,trim,cut,clip,video-editing,node-gateway \
+            --changelog "Auto-publish from commit ${{ github.sha }}"
+
+      - name: Publish concat-video skill
+        run: |
+          clawhub publish ./skills/concat-video \
+            --slug concat-video \
+            --name "Concat Video" \
+            --version 2.${{ github.run_number }}.0 \
+            --tags latest,video,heygen,concat,merge,join,video-editing,node-gateway \
+            --changelog "Auto-publish from commit ${{ github.sha }}"
+
+      - name: Publish save-video skill
+        run: |
+          clawhub publish ./skills/save-video \
+            --slug save-video \
+            --name "Save Video" \
+            --version 2.${{ github.run_number }}.0 \
+            --tags latest,video,heygen,save,persist,library,node-gateway \
+            --changelog "Auto-publish from commit ${{ github.sha }}"
+
+      - name: Publish generate-image skill
+        run: |
+          clawhub publish ./skills/generate-image \
+            --slug generate-image-heygen \
+            --name "Generate Image" \
+            --version 2.${{ github.run_number }}.0 \
+            --tags latest,image,heygen,ai,generation,text-to-image,node-gateway \
+            --changelog "Auto-publish from commit ${{ github.sha }}"
+
+      - name: Publish speech-to-text skill
+        run: |
+          clawhub publish ./skills/speech-to-text \
+            --slug speech-to-text-heygen \
+            --name "Speech to Text" \
+            --version 2.${{ github.run_number }}.0 \
+            --tags latest,asr,transcription,heygen,audio,speech-to-text,node-gateway \
+            --changelog "Auto-publish from commit ${{ github.sha }}"
+
+      - name: Publish speech-to-speech skill
+        run: |
+          clawhub publish ./skills/speech-to-speech \
+            --slug speech-to-speech-heygen \
+            --name "Speech to Speech" \
+            --version 2.${{ github.run_number }}.0 \
+            --tags latest,voice,heygen,sts,voice-conversion,voice-cloning,node-gateway \
+            --changelog "Auto-publish from commit ${{ github.sha }}"
+
+      - name: Publish content-moderation skill
+        run: |
+          clawhub publish ./skills/content-moderation \
+            --slug content-moderation-heygen \
+            --name "Content Moderation" \
+            --version 2.${{ github.run_number }}.0 \
+            --tags latest,moderation,heygen,safety,content-policy,node-gateway \
+            --changelog "Auto-publish from commit ${{ github.sha }}"
+
+      - name: Publish llm skill
+        run: |
+          clawhub publish ./skills/llm \
+            --slug llm-heygen \
+            --name "LLM Text Generation" \
+            --version 2.${{ github.run_number }}.0 \
+            --tags latest,llm,heygen,ai,text-generation,node-gateway \
+            --changelog "Auto-publish from commit ${{ github.sha }}"
+
+      - name: Publish website-extraction skill
+        run: |
+          clawhub publish ./skills/website-extraction \
+            --slug website-extraction-heygen \
+            --name "Website Extraction" \
+            --version 2.${{ github.run_number }}.0 \
+            --tags latest,extraction,heygen,web,scraping,text,node-gateway \
+            --changelog "Auto-publish from commit ${{ github.sha }}"
+
+      - name: Publish pdf-extraction skill
+        run: |
+          clawhub publish ./skills/pdf-extraction \
+            --slug pdf-extraction-heygen \
+            --name "PDF Extraction" \
+            --version 2.${{ github.run_number }}.0 \
+            --tags latest,extraction,heygen,pdf,text,document,node-gateway \
+            --changelog "Auto-publish from commit ${{ github.sha }}"
+
+      - name: Publish script-generator skill
+        run: |
+          clawhub publish ./skills/script-generator \
+            --slug script-generator-heygen \
+            --name "Script Generator" \
+            --version 2.${{ github.run_number }}.0 \
+            --tags latest,script,heygen,podcast,content,generation,node-gateway \
+            --changelog "Auto-publish from commit ${{ github.sha }}"
+
+      - name: Publish avatar-video skill
+        run: |
+          clawhub publish ./skills/avatar-video \
+            --slug avatar-video-heygen \
+            --name "Avatar Video" \
+            --version 2.${{ github.run_number }}.0 \
+            --tags latest,avatar,heygen,video,talking-head,inference,node-gateway \
+            --changelog "Auto-publish from commit ${{ github.sha }}"
