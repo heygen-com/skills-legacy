@@ -102,7 +102,9 @@ All skills use the HeyGen API:
 |----------|-------|---------|
 | `POST /v1/video_agent/generate` | heygen | One-shot prompt-to-video |
 | `POST /v2/video/generate` | heygen | Precise multi-scene video generation |
-| `GET /v1/video_status.get` | heygen | Check video generation status |
+| `GET /v2/videos/{video_id}` | heygen | Get video details and status |
+| `GET /v2/videos` | heygen | List account videos |
+| `DELETE /v2/videos/{video_id}` | heygen | Delete a video |
 | `GET /v2/avatars` | heygen | List available avatars |
 | `GET /v2/voices` | heygen | List available voices |
 | `POST /v1/audio/text_to_speech` | text-to-speech | Generate speech audio |

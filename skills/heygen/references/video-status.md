@@ -9,14 +9,14 @@ After generating a video, you need to poll for status until the video is complet
 
 ## MCP Tool (Preferred)
 
-If the HeyGen MCP server is connected, use `mcp__heygen__get_video` with the `videoId` parameter. It returns status, video_url, thumbnail_url, duration, and all metadata in a single call.
+If the HeyGen MCP server is connected, use `mcp__heygen__get_video` with the `videoId` parameter. It returns status, video_url, thumbnail_url, duration, title, gif_url, captioned_video_url, and other metadata in a single call.
 
 ## Checking Video Status (Direct API)
 
 ### curl
 
 ```bash
-curl -X GET "https://api.heygen.com/v1/video_status.get?video_id=YOUR_VIDEO_ID" \
+curl -X GET "https://api.heygen.com/v2/videos/YOUR_VIDEO_ID" \
   -H "X-Api-Key: $HEYGEN_API_KEY"
 ```
 
@@ -26,18 +26,27 @@ curl -X GET "https://api.heygen.com/v1/video_status.get?video_id=YOUR_VIDEO_ID" 
 interface VideoStatusResponse {
   error: null | string;
   data: {
-    video_id: string;
+    id: string;
     status: "pending" | "processing" | "completed" | "failed";
     video_url?: string;
     thumbnail_url?: string;
     duration?: number;
-    error?: string;
+    title?: string;
+    created_at?: string;
+    completed_at?: string;
+    gif_url?: string;
+    captioned_video_url?: string;
+    subtitle_url?: string;
+    folder_id?: string;
+    output_language?: string;
+    failure_code?: string;
+    failure_message?: string;
   };
 }
 
 async function getVideoStatus(videoId: string): Promise<VideoStatusResponse["data"]> {
   const response = await fetch(
-    `https://api.heygen.com/v1/video_status.get?video_id=${videoId}`,
+    `https://api.heygen.com/v2/videos/${videoId}`,
     { headers: { "X-Api-Key": process.env.HEYGEN_API_KEY! } }
   );
 
@@ -59,8 +68,7 @@ import os
 
 def get_video_status(video_id: str) -> dict:
     response = requests.get(
-        f"https://api.heygen.com/v1/video_status.get",
-        params={"video_id": video_id},
+        f"https://api.heygen.com/v2/videos/{video_id}",
         headers={"X-Api-Key": os.environ["HEYGEN_API_KEY"]}
     )
 
@@ -105,11 +113,19 @@ Video generation typically takes **5-15 minutes**, but can exceed 20 minutes dur
 {
   "error": null,
   "data": {
-    "video_id": "abc123",
+    "id": "abc123",
     "status": "completed",
     "video_url": "https://files.heygen.ai/video/abc123.mp4",
     "thumbnail_url": "https://files.heygen.ai/thumbnail/abc123.jpg",
-    "duration": 45.2
+    "duration": 45.2,
+    "title": "My Video",
+    "created_at": "2024-01-15T10:30:00Z",
+    "completed_at": "2024-01-15T10:38:00Z",
+    "gif_url": "https://files.heygen.ai/gif/abc123.gif",
+    "captioned_video_url": null,
+    "subtitle_url": null,
+    "folder_id": null,
+    "output_language": "en"
   }
 }
 ```
@@ -120,9 +136,10 @@ Video generation typically takes **5-15 minutes**, but can exceed 20 minutes dur
 {
   "error": null,
   "data": {
-    "video_id": "abc123",
+    "id": "abc123",
     "status": "failed",
-    "error": "Script too long for selected avatar"
+    "failure_code": "script_too_long",
+    "failure_message": "Script too long for selected avatar"
   }
 }
 ```
@@ -146,7 +163,7 @@ async function waitForVideo(
       case "completed":
         return status.video_url!;
       case "failed":
-        throw new Error(status.error || "Video generation failed");
+        throw new Error(status.failure_message || "Video generation failed");
       case "pending":
       case "processing":
         await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
@@ -181,7 +198,7 @@ async function waitForVideoWithProgress(
       case "completed":
         return status.video_url!;
       case "failed":
-        throw new Error(status.error || "Video generation failed");
+        throw new Error(status.failure_message || "Video generation failed");
       default:
         await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
     }
@@ -224,7 +241,7 @@ def wait_for_video(
         if status == "completed":
             return status_data["video_url"]
         elif status == "failed":
-            raise Exception(status_data.get("error", "Video generation failed"))
+            raise Exception(status_data.get("failure_message", "Video generation failed"))
 
         time.sleep(poll_interval)
 
@@ -431,11 +448,13 @@ async function checkVideoStatus(): Promise<void> {
         videoUrl: status.video_url,
         thumbnailUrl: status.thumbnail_url,
         duration: status.duration,
-        completedAt: new Date().toISOString(),
+        title: status.title,
+        createdAt: status.created_at,
+        completedAt: status.completed_at,
       }, null, 2));
       break;
     case "failed":
-      console.error(`Video failed: ${status.error}`);
+      console.error(`Video failed: ${status.failure_message}`);
       fs.unlinkSync("pending-video.json");
       break;
     default:

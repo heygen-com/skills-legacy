@@ -117,5 +117,5 @@ Three channels, one repo:
 - Base URL: `https://api.heygen.com`
 - Auth header: `X-Api-Key: $HEYGEN_API_KEY`
 - Response format: `{ "error": null | string, "data": T }`
-- Video generation is async: generate returns `video_id`, poll `GET /v1/video_status.get` for completion
+- Video generation is async: generate returns `video_id`, poll `GET /v2/videos/{video_id}` for completion
 - MCP tools (`mcp__heygen__*`) are preferred over direct API calls when available
