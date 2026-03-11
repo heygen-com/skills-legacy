@@ -410,7 +410,7 @@ async function waitForVideo(videoId: string): Promise<string> {
 
   for (let i = 0; i < maxAttempts; i++) {
     const response = await fetch(
-      `https://api.heygen.com/v1/video_status.get?video_id=${videoId}`,
+      `https://api.heygen.com/v2/videos/${videoId}`,
       { headers: { "X-Api-Key": process.env.HEYGEN_API_KEY! } }
     );
 
@@ -419,7 +419,7 @@ async function waitForVideo(videoId: string): Promise<string> {
     if (data.status === "completed") {
       return data.video_url;
     } else if (data.status === "failed") {
-      throw new Error(data.error || "Video generation failed");
+      throw new Error(data.failure_message || "Video generation failed");
     }
 
     await new Promise((r) => setTimeout(r, pollInterval));

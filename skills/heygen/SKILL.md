@@ -23,9 +23,9 @@ If HeyGen MCP tools are available (`mcp__heygen__*`), **prefer them** over direc
 | Task | MCP Tool | Fallback (Direct API) |
 |------|----------|----------------------|
 | Generate video from prompt | `mcp__heygen__generate_video_agent` | `POST /v1/video_agent/generate` |
-| Check video status / get URL | `mcp__heygen__get_video` | `GET /v1/video_status.get` |
-| List account videos | `mcp__heygen__list_videos` | `GET /v1/video.list` |
-| Delete a video | `mcp__heygen__delete_video` | `DELETE /v1/video.delete` |
+| Check video status / get URL | `mcp__heygen__get_video` | `GET /v2/videos/{video_id}` |
+| List account videos | `mcp__heygen__list_videos` | `GET /v2/videos` |
+| Delete a video | `mcp__heygen__delete_video` | `DELETE /v2/videos/{video_id}` |
 
 If no HeyGen MCP tools are available, use direct HTTP API calls with `X-Api-Key: $HEYGEN_API_KEY` header as documented in the reference files.
 
@@ -42,7 +42,7 @@ Always use [prompt-optimizer.md](references/prompt-optimizer.md) guidelines to s
 **Without MCP tools (direct API):**
 1. Write an optimized prompt using [prompt-optimizer.md](references/prompt-optimizer.md) → [visual-styles.md](references/visual-styles.md)
 2. `POST /v1/video_agent/generate` — see [video-agent.md](references/video-agent.md)
-3. `GET /v1/video_status.get?video_id=<id>` — see [video-status.md](references/video-status.md)
+3. `GET /v2/videos/<id>` — see [video-status.md](references/video-status.md)
 
 Only use v2/video/generate when user explicitly needs:
 - Exact script without AI modification
