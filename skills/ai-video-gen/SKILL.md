@@ -1,7 +1,7 @@
 ---
-name: generate-video
+name: ai-video-gen
 description: |
-  Generate AI videos from text prompts using the HeyGen API. Use when: (1) Generating videos from text descriptions, (2) Creating AI-generated video clips for content production, (3) Image-to-video generation with a reference image, (4) Choosing between video generation providers (VEO, Kling, Sora, Runway, Seedance), (5) Working with HeyGen's /v1/nodes/executions endpoint for video generation.
+  Generate AI videos from text prompts using the HeyGen API. Use when: (1) Generating videos from text descriptions, (2) Creating AI-generated video clips for content production, (3) Image-to-video generation with a reference image, (4) Choosing between video generation providers (VEO, Kling, Sora, Runway, Seedance), (5) Working with HeyGen's /v1/workflows/executions endpoint for video generation.
 allowed-tools: mcp__heygen__*
 metadata:
   openclaw:
@@ -20,30 +20,30 @@ Generate AI videos from text prompts. Supports multiple providers (VEO 3.1, Klin
 All requests require the `X-Api-Key` header. Set the `HEYGEN_API_KEY` environment variable.
 
 ```bash
-curl -X POST "https://api.heygen.com/v1/nodes/executions" \
+curl -X POST "https://api.heygen.com/v1/workflows/executions" \
   -H "X-Api-Key: $HEYGEN_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"node_type": "GenerateVideoNode", "input": {"prompt": "A drone shot flying over a coastal city at sunset"}}'
+  -d '{"workflow_type": "GenerateVideoNode", "input": {"prompt": "A drone shot flying over a coastal city at sunset"}}'
 ```
 
 ## Default Workflow
 
-1. Call `POST /v1/nodes/executions` with `node_type: "GenerateVideoNode"` and your prompt
+1. Call `POST /v1/workflows/executions` with `workflow_type: "GenerateVideoNode"` and your prompt
 2. Receive a `execution_id` in the response
-3. Poll `GET /v1/nodes/executions/{id}` every 10 seconds until status is `completed`
+3. Poll `GET /v1/workflows/executions/{id}` every 10 seconds until status is `completed`
 4. Use the returned `video_url` from the output
 
 ## Execute Video Generation
 
 ### Endpoint
 
-`POST https://api.heygen.com/v1/nodes/executions`
+`POST https://api.heygen.com/v1/workflows/executions`
 
 ### Request Fields
 
 | Field | Type | Req | Description |
 |-------|------|:---:|-------------|
-| `node_type` | string | Y | Must be `"GenerateVideoNode"` |
+| `workflow_type` | string | Y | Must be `"GenerateVideoNode"` |
 | `input.prompt` | string | Y | Text description of the video to generate |
 | `input.provider` | string | | Video generation provider (default: `"veo_3_1"`). See Providers below. |
 | `input.aspect_ratio` | string | | Aspect ratio (default: `"16:9"`). Common values: `"16:9"`, `"9:16"`, `"1:1"` |
@@ -72,11 +72,11 @@ curl -X POST "https://api.heygen.com/v1/nodes/executions" \
 ### curl
 
 ```bash
-curl -X POST "https://api.heygen.com/v1/nodes/executions" \
+curl -X POST "https://api.heygen.com/v1/workflows/executions" \
   -H "X-Api-Key: $HEYGEN_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "node_type": "GenerateVideoNode",
+    "workflow_type": "GenerateVideoNode",
     "input": {
       "prompt": "A drone shot flying over a coastal city at golden hour, cinematic lighting",
       "provider": "veo_3_1",
@@ -105,14 +105,14 @@ interface ExecuteResponse {
 }
 
 async function generateVideo(input: GenerateVideoInput): Promise<string> {
-  const response = await fetch("https://api.heygen.com/v1/nodes/executions", {
+  const response = await fetch("https://api.heygen.com/v1/workflows/executions", {
     method: "POST",
     headers: {
       "X-Api-Key": process.env.HEYGEN_API_KEY!,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      node_type: "GenerateVideoNode",
+      workflow_type: "GenerateVideoNode",
       input,
     }),
   });
@@ -136,7 +136,7 @@ def generate_video(
     tail_image_url: str | None = None,
 ) -> str:
     payload = {
-        "node_type": "GenerateVideoNode",
+        "workflow_type": "GenerateVideoNode",
         "input": {
             "prompt": prompt,
             "provider": provider,
@@ -150,7 +150,7 @@ def generate_video(
         payload["input"]["tail_image_url"] = tail_image_url
 
     response = requests.post(
-        "https://api.heygen.com/v1/nodes/executions",
+        "https://api.heygen.com/v1/workflows/executions",
         headers={
             "X-Api-Key": os.environ["HEYGEN_API_KEY"],
             "Content-Type": "application/json",
@@ -177,12 +177,12 @@ def generate_video(
 
 ### Endpoint
 
-`GET https://api.heygen.com/v1/nodes/executions/{execution_id}`
+`GET https://api.heygen.com/v1/workflows/executions/{execution_id}`
 
 ### curl
 
 ```bash
-curl -X GET "https://api.heygen.com/v1/nodes/executions/node-gw-v1d2e3o4" \
+curl -X GET "https://api.heygen.com/v1/workflows/executions/node-gw-v1d2e3o4" \
   -H "X-Api-Key: $HEYGEN_API_KEY"
 ```
 
@@ -218,7 +218,7 @@ async function generateVideoAndWait(
   const startTime = Date.now();
   while (Date.now() - startTime < maxWaitMs) {
     const response = await fetch(
-      `https://api.heygen.com/v1/nodes/executions/${executionId}`,
+      `https://api.heygen.com/v1/workflows/executions/${executionId}`,
       { headers: { "X-Api-Key": process.env.HEYGEN_API_KEY! } }
     );
     const { data } = await response.json();
@@ -248,11 +248,11 @@ async function generateVideoAndWait(
 ### Simple Text-to-Video
 
 ```bash
-curl -X POST "https://api.heygen.com/v1/nodes/executions" \
+curl -X POST "https://api.heygen.com/v1/workflows/executions" \
   -H "X-Api-Key: $HEYGEN_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "node_type": "GenerateVideoNode",
+    "workflow_type": "GenerateVideoNode",
     "input": {
       "prompt": "A person walking through a sunlit park, shallow depth of field"
     }
@@ -263,7 +263,7 @@ curl -X POST "https://api.heygen.com/v1/nodes/executions" \
 
 ```json
 {
-  "node_type": "GenerateVideoNode",
+  "workflow_type": "GenerateVideoNode",
   "input": {
     "prompt": "Animate this product photo with a slow zoom and soft particle effects",
     "reference_image_url": "https://example.com/product-photo.png",
@@ -276,7 +276,7 @@ curl -X POST "https://api.heygen.com/v1/nodes/executions" \
 
 ```json
 {
-  "node_type": "GenerateVideoNode",
+  "workflow_type": "GenerateVideoNode",
   "input": {
     "prompt": "A trendy coffee shop interior, camera slowly panning across the counter",
     "aspect_ratio": "9:16",
@@ -289,7 +289,7 @@ curl -X POST "https://api.heygen.com/v1/nodes/executions" \
 
 ```json
 {
-  "node_type": "GenerateVideoNode",
+  "workflow_type": "GenerateVideoNode",
   "input": {
     "prompt": "Abstract colorful shapes morphing and flowing",
     "provider": "ltx_distilled"
@@ -302,7 +302,7 @@ curl -X POST "https://api.heygen.com/v1/nodes/executions" \
 1. **Be descriptive in prompts** — include camera movement, lighting, style, and mood details
 2. **Default to VEO 3.1** for highest quality; use `ltx_distilled` or `veo3_fast` when speed matters
 3. **Use reference images** for image-to-video generation — great for animating product photos or still images
-4. **Video generation is the slowest node** — allow up to 5 minutes, poll every 10 seconds
+4. **Video generation is the slowest workflow** — allow up to 5 minutes, poll every 10 seconds
 5. **Aspect ratio matters** — use `9:16` for social media stories/reels, `16:9` for landscape, `1:1` for square
 6. **Output includes `asset_id`** — use this to reference the generated video in other HeyGen workflows
 7. **Output URLs are temporary** — download or save generated videos promptly
