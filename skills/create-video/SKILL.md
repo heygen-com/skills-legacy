@@ -86,6 +86,7 @@ If the user needs **precise control** over specific avatars, exact scripts, per-
 
 ### Foundation
 - [references/video-status.md](references/video-status.md) - Polling patterns and download URLs
+- [references/webhooks.md](references/webhooks.md) - Webhook endpoints and events
 - [references/assets.md](references/assets.md) - Uploading images, videos, audio as references
 - [references/dimensions.md](references/dimensions.md) - Resolution and aspect ratios
 - [references/quota.md](references/quota.md) - Credit system and usage limits
