@@ -8,6 +8,8 @@ A collection of skills for working with the HeyGen AI video creation API, design
 |-------|-------------|
 | [create-video](skills/create-video) | Create videos from a text prompt — describe what you want and AI handles the rest (Video Agent API) |
 | [avatar-video](skills/avatar-video) | Build videos with precise control over avatars, voices, scripts, scenes, and backgrounds (v2 API) |
+| [ai-video-gen](skills/ai-video-gen) | Generate AI videos from text prompts with multiple provider options (VEO, Kling, Sora, Runway) via the Workflow Gateway |
+| [faceswap](skills/faceswap) | Swap a face from a source image into a target video using GPU-accelerated AI via the Workflow Gateway |
 | [text-to-speech](skills/text-to-speech) | Generate standalone speech audio from text using HeyGen's Starfish TTS model with voice, speed, pitch, and emotion control |
 | [video-translate](skills/video-translate) | Translate and dub existing videos into 12+ languages with lip-sync, voice cloning, and multi-speaker support |
 | [visual-style](skills/visual-style) | Create, extract, and apply portable visual design systems (`visual-style.md`) across HeyGen, slides, Figma, and more |
@@ -76,6 +78,8 @@ The skills should appear when Claude Code loads. You can verify by asking Claude
 | Generate video from a prompt | `create-video` |
 | Generate video with precise scene control | `avatar-video` |
 | List avatars and voices | `avatar-video` |
+| Generate AI video from a text prompt | `ai-video-gen` |
+| Swap a face into a video | `faceswap` |
 | Generate speech audio from text | `text-to-speech` |
 | List TTS voices | `text-to-speech` |
 | Translate/dub an existing video | `video-translate` |
@@ -134,6 +138,8 @@ All skills use the HeyGen API:
 | `POST /v1/audio/text_to_speech` | text-to-speech | Generate speech audio |
 | `GET /v1/audio/voices` | text-to-speech | List TTS-compatible voices |
 | `POST /v2/video_translate` | video-translate | Start video translation |
+| `POST /v1/workflows/executions` | ai-video-gen, faceswap | Execute a workflow (video generation, face swap) |
+| `GET /v1/workflows/executions/{id}` | ai-video-gen, faceswap | Check workflow execution status |
 
 ## Requirements
 
