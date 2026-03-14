@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visual Style Extraction — Change Review</title>
+<style>
+  :root {
+    --bg: #0F1117;
+    --surface: #1A1D27;
+    --surface-2: #232733;
+    --border: #2E3345;
+    --text: #E4E6EF;
+    --text-muted: #8B8FA3;
+    --accent: #7C6AFF;
+    --accent-glow: rgba(124, 106, 255, 0.15);
+    --green: #3DD68C;
+    --green-bg: rgba(61, 214, 140, 0.08);
+    --red: #FF6B6B;
+    --red-bg: rgba(255, 107, 107, 0.08);
+    --yellow: #FFD166;
+    --cyan: #56CCF2;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Navigation */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(15, 17, 23, 0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+  }
+  nav .inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    height: 56px;
+    overflow-x: auto;
+  }
+  nav .brand {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--accent);
+    white-space: nowrap;
+    letter-spacing: -0.02em;
+  }
+  nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 13px;
+    white-space: nowrap;
+    transition: color 0.15s;
+  }
+  nav a:hover { color: var(--text); }
+  nav a.active { color: var(--accent); }
+
+  /* Hero */
+  .hero {
+    padding: 120px 32px 64px;
+    text-align: center;
+    background: radial-gradient(ellipse 80% 50% at 50% 0%, var(--accent-glow), transparent);
+  }
+  .hero h1 {
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero p {
+    color: var(--text-muted);
+    font-size: 18px;
+    max-width: 640px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Stats bar */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    padding: 32px;
+    margin-top: 32px;
+  }
+  .stat { text-align: center; }
+  .stat .num {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  .stat .num.green { color: var(--green); }
+  .stat .num.red { color: var(--red); }
+  .stat .num.yellow { color: var(--yellow); }
+  .stat .num.cyan { color: var(--cyan); }
+  .stat .label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+  }
+
+  /* Section */
+  section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 64px 32px;
+  }
+  section + section { border-top: 1px solid var(--border); }
+  .section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-size: clamp(24px, 3vw, 36px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+  .section-desc {
+    color: var(--text-muted);
+    font-size: 16px;
+    margin-bottom: 40px;
+    max-width: 720px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  .card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card h3 .badge {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .badge-new { background: var(--green-bg); color: var(--green); border: 1px solid rgba(61,214,140,0.2); }
+  .badge-changed { background: rgba(255,209,102,0.1); color: var(--yellow); border: 1px solid rgba(255,209,102,0.2); }
+  .badge-enhanced { background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(124,106,255,0.25); }
+
+  /* Code blocks */
+  pre {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.65;
+    margin: 16px 0;
+    tab-size: 2;
+  }
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+  }
+  p code, li code {
+    background: var(--surface-2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--cyan);
+  }
+
+  /* Diff styling */
+  .diff-add {
+    color: var(--green);
+    background: var(--green-bg);
+    display: block;
+    margin: 0 -20px;
+    padding: 0 20px;
+  }
+  .diff-remove {
+    color: var(--red);
+    background: var(--red-bg);
+    display: block;
+    margin: 0 -20px;
+    padding: 0 20px;
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+  .diff-context {
+    color: var(--text-muted);
+    display: block;
+  }
+
+  /* Comparison grid */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 768px) { .compare { grid-template-columns: 1fr; } }
+  .compare-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .compare-before .compare-label { color: var(--red); }
+  .compare-after .compare-label { color: var(--green); }
+
+  /* File path */
+  .filepath {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .filepath::before {
+    content: "";
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
+    border-radius: 3px;
+    opacity: 0.5;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(46, 51, 69, 0.5);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+
+  /* Lists */
+  ul, ol { padding-left: 20px; }
+  li { margin-bottom: 8px; color: var(--text); }
+  li::marker { color: var(--accent); }
+
+  /* Highlight callout */
+  .callout {
+    background: var(--accent-glow);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  .callout strong { color: var(--accent); }
+
+  /* Summary grid */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 32px;
+  }
+  .summary-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .summary-item h4 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .summary-item p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* Scroll padding for anchors */
+  [id] { scroll-margin-top: 72px; }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 48px 32px;
+    color: var(--text-muted);
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <span class="brand">visual-style review</span>
+    <a href="#overview">Overview</a>
+    <a href="#typography">Typography Schema</a>
+    <a href="#imagery">Imagery Section</a>
+    <a href="#extractor">Extractor Rewrite</a>
+    <a href="#template">Template</a>
+    <a href="#skill">SKILL.md</a>
+    <a href="#example">Example Output</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <h1>Visual Style <span>Extraction</span> Improvements</h1>
+  <p>Precise colors, exact typography values, imagery classification, and a step-by-step CSS extraction workflow.</p>
+  <div class="stats">
+    <div class="stat"><div class="num cyan">4</div><div class="label">Files Changed</div></div>
+    <div class="stat"><div class="num green">+319</div><div class="label">Additions</div></div>
+    <div class="stat"><div class="num red">-116</div><div class="label">Removals</div></div>
+    <div class="stat"><div class="num yellow">3</div><div class="label">New Concepts</div></div>
+  </div>
+</div>
+
+<!-- Overview -->
+<section id="overview">
+  <div class="section-label">Overview</div>
+  <div class="section-title">What Changed and Why</div>
+  <div class="section-desc">
+    The previous extraction guidance was too vague&mdash;it said "check the CSS" without showing exactly <em>how</em> to pull precise values. These changes make extraction deterministic and faithful.
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-item">
+      <h4><span style="color:var(--green)">&#9679;</span> Precise Typography</h4>
+      <p>Added <code>size</code>, <code>line_height</code>, and <code>letter_spacing</code> sub-fields to the typography schema. No more "tight tracking"&mdash;now it's <code>"-0.02em"</code>.</p>
+    </div>
+    <div class="summary-item">
+      <h4><span style="color:var(--green)">&#9679;</span> Imagery Classification</h4>
+      <p>New <code>imagery</code> section captures visual style (photographic, illustrated, sketch, etc.), image treatment, and common subjects.</p>
+    </div>
+    <div class="summary-item">
+      <h4><span style="color:var(--yellow)">&#9679;</span> CSS Extraction Guide</h4>
+      <p>Complete rewrite of from-website.md with a step-by-step guide: CSS variables first, then computed styles, font loading detection.</p>
+    </div>
+    <div class="summary-item">
+      <h4><span style="color:var(--yellow)">&#9679;</span> Color Precision</h4>
+      <p>Checklist now maps specific CSS properties to specific output fields. Background color from <code>body background-color</code>, not guessing.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Typography Schema -->
+<section id="typography">
+  <div class="section-label">spec.md</div>
+  <div class="section-title">Enhanced Typography Schema</div>
+  <div class="section-desc">
+    Each typography tier now supports three new sub-fields for exact CSS values. These replace vague descriptions with measured values.
+  </div>
+
+  <div class="filepath">skills/visual-style/references/spec.md</div>
+
+  <div class="card">
+    <h3>New Typography Sub-fields <span class="badge badge-new">New</span></h3>
+    <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">Added to the typography object schema definition:</p>
+    <pre><span class="diff-context">display:</span>
+<span class="diff-context">  family: "Font Family Name"</span>
+<span class="diff-context">  weight: "bold"</span>
+<span class="diff-context">  style: "uppercase, tight tracking"</span>
+<span class="diff-add">  size: "48px"</span>
+<span class="diff-add">  line_height: "1.1"</span>
+<span class="diff-add">  letter_spacing: "-0.02em"</span></pre>
+  </div>
+
+  <div class="card">
+    <h3>Sub-field Reference Table <span class="badge badge-new">New</span></h3>
+    <table>
+      <tr><th>Sub-field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+      <tr><td><code>family</code></td><td>string</td><td>yes</td><td>Font family name with fallbacks (e.g., <code>"Inter, system-ui, sans-serif"</code>)</td></tr>
+      <tr><td><code>weight</code></td><td>string</td><td>yes</td><td>Font weight &mdash; numeric (<code>"600"</code>) or named (<code>"bold"</code>)</td></tr>
+      <tr><td><code>style</code></td><td>string</td><td>yes</td><td>Descriptive style notes (case, tracking description, etc.)</td></tr>
+      <tr><td><code>size</code></td><td>string</td><td style="color:var(--green)">no (new)</td><td>Reference font size with unit (e.g., <code>"48px"</code>, <code>"3rem"</code>)</td></tr>
+      <tr><td><code>line_height</code></td><td>string</td><td style="color:var(--green)">no (new)</td><td>Line height as unitless ratio or with unit (e.g., <code>"1.2"</code>, <code>"56px"</code>)</td></tr>
+      <tr><td><code>letter_spacing</code></td><td>string</td><td style="color:var(--green)">no (new)</td><td>Letter spacing / tracking (e.g., <code>"-0.02em"</code>, <code>"0.05em"</code>, <code>"normal"</code>)</td></tr>
+    </table>
+    <div class="callout">
+      <strong>Key design decision:</strong> These are optional fields (not required) to maintain backward compatibility. Existing visual-style.md files remain valid. But the extractor is now strongly guided to always capture them.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Updated Example in spec.md <span class="badge badge-changed">Changed</span></h3>
+    <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">The Swiss International Style example now shows the new fields:</p>
+    <pre><span class="diff-context">typography:</span>
+<span class="diff-context">  display:</span>
+<span class="diff-context">    family: "Helvetica"</span>
+<span class="diff-context">    weight: "bold"</span>
+<span class="diff-context">    style: "uppercase or sentence case, tight tracking"</span>
+<span class="diff-add">    size: "72px"</span>
+<span class="diff-add">    line_height: "1.05"</span>
+<span class="diff-add">    letter_spacing: "-0.02em"</span>
+<span class="diff-context">  body:</span>
+<span class="diff-context">    family: "Helvetica"</span>
+<span class="diff-context">    weight: "regular"</span>
+<span class="diff-context">    style: "flush left, ragged right, generous leading"</span>
+<span class="diff-add">    size: "16px"</span>
+<span class="diff-add">    line_height: "1.6"</span>
+<span class="diff-add">    letter_spacing: "normal"</span>
+<span class="diff-context">  caption:</span>
+<span class="diff-context">    family: "Helvetica"</span>
+<span class="diff-context">    weight: "light"</span>
+<span class="diff-context">    style: "small, uppercase, wide tracking"</span>
+<span class="diff-add">    size: "11px"</span>
+<span class="diff-add">    line_height: "1.4"</span>
+<span class="diff-add">    letter_spacing: "0.1em"</span></pre>
+  </div>
+</section>
+
+<!-- Imagery -->
+<section id="imagery">
+  <div class="section-label">spec.md</div>
+  <div class="section-title">New Imagery Section</div>
+  <div class="section-desc">
+    A brand-new section capturing the visual style of images, illustrations, and graphics&mdash;critical for faithful style reproduction.
+  </div>
+
+  <div class="filepath">skills/visual-style/references/spec.md</div>
+
+  <div class="card">
+    <h3>Imagery Schema <span class="badge badge-new">New</span></h3>
+    <table>
+      <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>imagery.style</code></td><td>string</td><td>Visual style classification: <code>"photographic"</code>, <code>"illustrated"</code>, <code>"3d-rendered"</code>, <code>"sketch"</code>, <code>"abstract-geometric"</code>, <code>"collage"</code>, <code>"pixel-art"</code></td></tr>
+      <tr><td><code>imagery.treatment</code></td><td>string</td><td>How images are treated: <code>"full-bleed hero photos"</code>, <code>"duotone filter"</code>, <code>"rounded corners with shadow"</code>, <code>"masked into shapes"</code></td></tr>
+      <tr><td><code>imagery.subjects</code></td><td>array</td><td>Common subject matter: <code>"product screenshots"</code>, <code>"lifestyle photography"</code>, <code>"abstract patterns"</code></td></tr>
+      <tr><td><code>imagery.notes</code></td><td>array</td><td>Additional observations about visual content</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Imagery Example <span class="badge badge-new">New</span></h3>
+    <pre><span class="diff-add">imagery:</span>
+<span class="diff-add">  style: "photographic with illustrated overlays"</span>
+<span class="diff-add">  treatment: "desaturated photos with gradient overlays, rounded 16px corners"</span>
+<span class="diff-add">  subjects:</span>
+<span class="diff-add">    - "product UI screenshots"</span>
+<span class="diff-add">    - "lifestyle team photography"</span>
+<span class="diff-add">    - "abstract gradient backgrounds"</span>
+<span class="diff-add">  notes:</span>
+<span class="diff-add">    - "No stock photos — all custom photography"</span>
+<span class="diff-add">    - "Illustrations use brand accent colors only"</span></pre>
+  </div>
+
+  <div class="card">
+    <h3>Imagery in Swiss Style Example <span class="badge badge-new">New</span></h3>
+    <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">Added to the Muller-Brockmann example in spec.md:</p>
+    <pre><span class="diff-add">imagery:</span>
+<span class="diff-add">  style: "abstract-geometric"</span>
+<span class="diff-add">  treatment: "flat geometric shapes, no photography"</span>
+<span class="diff-add">  subjects:</span>
+<span class="diff-add">    - "data visualizations"</span>
+<span class="diff-add">    - "geometric compositions"</span>
+<span class="diff-add">    - "typographic posters"</span>
+<span class="diff-add">  notes:</span>
+<span class="diff-add">    - "Imagery IS the data — charts, grids, counters"</span>
+<span class="diff-add">    - "No photographs or illustrations of people"</span></pre>
+  </div>
+</section>
+
+<!-- Extractor Rewrite -->
+<section id="extractor">
+  <div class="section-label">from-website.md &mdash; major rewrite</div>
+  <div class="section-title">Precise Extraction Workflow</div>
+  <div class="section-desc">
+    The biggest change. Replaces the vague "check the CSS" guidance with a deterministic, step-by-step extraction process.
+  </div>
+
+  <div class="filepath">skills/visual-style/references/extractors/from-website.md</div>
+
+  <div class="card">
+    <h3>Workflow: Before vs After <span class="badge badge-changed">Changed</span></h3>
+    <div class="compare">
+      <div class="compare-before">
+        <div class="compare-label">Before (6 steps, vague)</div>
+        <pre><span class="diff-remove">1. Receive URL</span>
+<span class="diff-remove">2. Fetch the page — Use web fetch to get the HTML/CSS</span>
+<span class="diff-remove">3. Take screenshots</span>
+<span class="diff-remove">4. Analyze — Identify colors, typography, layout, motion, mood</span>
+<span class="diff-remove">5. Generate — Output complete visual-style.md</span>
+<span class="diff-remove">6. Validate — Ensure all required fields are present</span></pre>
+      </div>
+      <div class="compare-after">
+        <div class="compare-label">After (8 steps, specific)</div>
+        <pre><span class="diff-add">1. Receive URL</span>
+<span class="diff-add">2. Fetch the page — full HTML source</span>
+<span class="diff-add">3. Extract CSS data — Parse inline styles, &lt;style&gt; blocks,</span>
+<span class="diff-add">   linked stylesheets. CSS custom properties first.</span>
+<span class="diff-add">4. Take screenshots — cross-reference extracted values</span>
+<span class="diff-add">5. Analyze deeply — apply extraction checklist</span>
+<span class="diff-add">6. Classify imagery — visual style of images/graphics</span>
+<span class="diff-add">7. Generate — with exact values</span>
+<span class="diff-add">8. Validate — hex codes, px/em/rem units, font names</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>"Where to Find Exact Values" Guide <span class="badge badge-new">New Section</span></h3>
+    <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">Entirely new section showing exactly where to look in the CSS:</p>
+
+    <h4 style="font-size:14px; margin: 16px 0 8px; color:var(--cyan);">CSS Custom Properties (Best Source)</h4>
+    <pre><span class="diff-add">/* Color tokens — look for these in :root, [data-theme], or body */</span>
+<span class="diff-add">--color-bg, --background, --bg-primary, --color-background</span>
+<span class="diff-add">--color-text, --text-primary, --foreground, --color-body</span>
+<span class="diff-add">--color-accent, --brand-primary, --color-cta, --color-link</span>
+<span class="diff-add">--color-muted, --text-secondary, --color-subtle</span>
+<span class="diff-add">--color-border, --border-color, --divider</span>
+<span class="diff-add"></span>
+<span class="diff-add">/* Typography tokens */</span>
+<span class="diff-add">--font-family, --font-sans, --font-display, --font-heading, --font-body, --font-mono</span>
+<span class="diff-add">--font-size-*, --text-*, --heading-size-*</span>
+<span class="diff-add">--line-height-*, --leading-*</span>
+<span class="diff-add">--letter-spacing-*, --tracking-*</span>
+<span class="diff-add">--font-weight-*</span>
+<span class="diff-add"></span>
+<span class="diff-add">/* Spacing tokens */</span>
+<span class="diff-add">--space-*, --gap-*, --padding-*, --radius-*</span></pre>
+
+    <h4 style="font-size:14px; margin: 16px 0 8px; color:var(--cyan);">Computed Styles Lookup Table</h4>
+    <table>
+      <tr><th>CSS Property</th><th>Where to Look</th><th>What to Record</th></tr>
+      <tr><td><code>background-color</code></td><td><code>&lt;body&gt;</code>, <code>&lt;main&gt;</code>, <code>.hero</code></td><td>Exact hex &mdash; <strong>primary background</strong></td></tr>
+      <tr><td><code>color</code></td><td><code>&lt;body&gt;</code>, <code>&lt;p&gt;</code></td><td>Exact hex &mdash; <strong>primary text color</strong></td></tr>
+      <tr><td><code>color</code></td><td><code>&lt;h1&gt;</code>, <code>&lt;h2&gt;</code>, <code>&lt;h3&gt;</code></td><td>Heading color (often different from body)</td></tr>
+      <tr><td><code>background-color</code></td><td><code>&lt;button&gt;</code>, <code>.btn</code>, <code>.cta</code></td><td>Accent / CTA color</td></tr>
+      <tr><td><code>font-family</code></td><td><code>&lt;body&gt;</code></td><td>Full fallback chain</td></tr>
+      <tr><td><code>font-family</code></td><td><code>&lt;h1&gt;</code>, <code>&lt;h2&gt;</code></td><td>Display font (if different)</td></tr>
+      <tr><td><code>font-size</code></td><td><code>&lt;h1&gt;</code> through <code>&lt;small&gt;</code></td><td>Full type scale</td></tr>
+      <tr><td><code>line-height</code></td><td><code>&lt;p&gt;</code>, <code>&lt;h1&gt;</code></td><td>Unitless ratio or px</td></tr>
+      <tr><td><code>letter-spacing</code></td><td><code>&lt;h1&gt;</code>, <code>&lt;h2&gt;</code>, <code>&lt;p&gt;</code></td><td>In em (e.g., <code>-0.02em</code>)</td></tr>
+      <tr><td><code>font-weight</code></td><td>headings, body, buttons</td><td>Numeric (<code>400</code>, <code>600</code>, <code>700</code>)</td></tr>
+    </table>
+
+    <h4 style="font-size:14px; margin: 16px 0 8px; color:var(--cyan);">Google Fonts / @font-face Detection</h4>
+    <pre><span class="diff-add">&lt;!-- Google Fonts link --&gt;</span>
+<span class="diff-add">&lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"&gt;</span>
+<span class="diff-add"></span>
+<span class="diff-add">&lt;!-- @font-face declarations --&gt;</span>
+<span class="diff-add">@font-face { font-family: "CustomFont"; src: url(...); }</span></pre>
+  </div>
+
+  <div class="card">
+    <h3>6-Step Extraction Prompt <span class="badge badge-enhanced">Enhanced</span></h3>
+    <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">Replaces the old "REQUIRED / RECOMMENDED" field list with a structured process:</p>
+    <pre><span class="diff-add">STEP 1 — EXTRACT RAW CSS VALUES</span>
+<span class="diff-add">Search the page source for:</span>
+<span class="diff-add">- CSS custom properties (:root variables)</span>
+<span class="diff-add">- @font-face declarations and Google Fonts links</span>
+<span class="diff-add">- Key element styles: body background-color, body color, h1/h2/h3, buttons, links</span>
+<span class="diff-add"></span>
+<span class="diff-add">STEP 2 — MAP TO COLORS</span>
+<span class="diff-add">- colors.primary: page background color AND primary text color (minimum 2)</span>
+<span class="diff-add">- colors.accent: CTA/button backgrounds, link colors, hover states</span>
+<span class="diff-add">- colors.neutral: secondary text, borders, muted backgrounds</span>
+<span class="diff-add">Every hex value must come directly from the CSS. Do not approximate.</span>
+<span class="diff-add"></span>
+<span class="diff-add">STEP 3 — MAP TO TYPOGRAPHY</span>
+<span class="diff-add">For each tier (display, body, caption), record:</span>
+<span class="diff-add">- family, weight, style, size, line_height, letter_spacing</span>
+<span class="diff-add">Capture the full type scale in typography.rules.</span>
+<span class="diff-add"></span>
+<span class="diff-add">STEP 4 — CLASSIFY IMAGERY</span>
+<span class="diff-add">- Visual style? (photographic, illustrated, sketch, geometric, etc.)</span>
+<span class="diff-add">- Image treatment? (filters, shapes, borders, shadows, overlays)</span>
+<span class="diff-add">- Subjects? (people, products, screenshots, abstract, patterns)</span>
+<span class="diff-add"></span>
+<span class="diff-add">STEP 5 — CAPTURE MOTION &amp; ANIMATION</span>
+<span class="diff-add">- transition properties and durations</span>
+<span class="diff-add">- @keyframes animation names and behaviors</span>
+<span class="diff-add">- Scroll-triggered effects, hover effects</span>
+<span class="diff-add"></span>
+<span class="diff-add">STEP 6 — GENERATE OUTPUT</span>
+<span class="diff-add">Complete YAML frontmatter + Markdown body sections.</span>
+<span class="diff-add">Include every value with its exact CSS source.</span></pre>
+  </div>
+
+  <div class="card">
+    <h3>Color Checklist: Before vs After <span class="badge badge-enhanced">Enhanced</span></h3>
+    <div class="compare">
+      <div class="compare-before">
+        <div class="compare-label">Before (generic)</div>
+        <pre><span class="diff-remove">- [ ] Background colors (primary surfaces)</span>
+<span class="diff-remove">- [ ] Text colors (headings vs body)</span>
+<span class="diff-remove">- [ ] Accent/CTA button colors</span>
+<span class="diff-remove">- [ ] Link colors (default, hover, visited)</span>
+<span class="diff-remove">- [ ] Border/divider colors</span>
+<span class="diff-remove">- [ ] Gradient usage (if any)</span></pre>
+      </div>
+      <div class="compare-after">
+        <div class="compare-label">After (maps CSS &rarr; output field)</div>
+        <pre><span class="diff-add">- [ ] body background-color → colors.primary[0]</span>
+<span class="diff-add">- [ ] body color → colors.primary[1]</span>
+<span class="diff-add">- [ ] h1/h2 color → colors.primary or accent</span>
+<span class="diff-add">- [ ] button background-color → colors.accent</span>
+<span class="diff-add">- [ ] a color → colors.accent</span>
+<span class="diff-add">- [ ] a:hover color → note in role</span>
+<span class="diff-add">- [ ] muted text → colors.neutral</span>
+<span class="diff-add">- [ ] section alternate bg → colors.neutral</span>
+<span class="diff-add">- [ ] border color → colors.neutral</span>
+<span class="diff-add">- [ ] gradients → color roles + prompt</span>
+<span class="diff-add">- [ ] Cross-check: bg + text match?</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Typography Checklist: Before vs After <span class="badge badge-enhanced">Enhanced</span></h3>
+    <div class="compare">
+      <div class="compare-before">
+        <div class="compare-label">Before (7 items, vague)</div>
+        <pre><span class="diff-remove">- [ ] Heading font family</span>
+<span class="diff-remove">- [ ] Body font family</span>
+<span class="diff-remove">- [ ] Font weights used (light, regular, bold, etc.)</span>
+<span class="diff-remove">- [ ] Text sizes (heading scale)</span>
+<span class="diff-remove">- [ ] Line heights</span>
+<span class="diff-remove">- [ ] Letter spacing patterns</span>
+<span class="diff-remove">- [ ] Text transform (uppercase, lowercase)</span></pre>
+      </div>
+      <div class="compare-after">
+        <div class="compare-label">After (14 items, exact CSS props)</div>
+        <pre><span class="diff-add">- [ ] Display font-family (with fallback stack)</span>
+<span class="diff-add">- [ ] Display font-weight (numeric: 400-900)</span>
+<span class="diff-add">- [ ] Display font-size (e.g., "56px", "3.5rem")</span>
+<span class="diff-add">- [ ] Display line-height (e.g., "1.1")</span>
+<span class="diff-add">- [ ] Display letter-spacing (e.g., "-0.03em")</span>
+<span class="diff-add">- [ ] Body font-family (with fallback stack)</span>
+<span class="diff-add">- [ ] Body font-weight</span>
+<span class="diff-add">- [ ] Body font-size (e.g., "16px", "1rem")</span>
+<span class="diff-add">- [ ] Body line-height (e.g., "1.6")</span>
+<span class="diff-add">- [ ] Body letter-spacing</span>
+<span class="diff-add">- [ ] Caption font-family, font-size, line-height</span>
+<span class="diff-add">- [ ] Full type scale h1→h6 + body</span>
+<span class="diff-add">- [ ] Text transforms used</span>
+<span class="diff-add">- [ ] Cross-check: fonts from @font-face?</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>New Imagery Checklist <span class="badge badge-new">New</span></h3>
+    <pre><span class="diff-add">### Imagery (classify what you see)</span>
+<span class="diff-add">- [ ] Visual style of images (photographic, illustrated, 3d, sketch, geometric, etc.)</span>
+<span class="diff-add">- [ ] Image treatment (filters, masks, rounded corners, shadows, overlays)</span>
+<span class="diff-add">- [ ] Common subjects (people, products, screenshots, abstract, patterns)</span>
+<span class="diff-add">- [ ] Icon style (outlined, filled, duotone, custom illustrated)</span>
+<span class="diff-add">- [ ] Whether the site uses SVG illustrations, photos, or both</span></pre>
+  </div>
+
+  <div class="card">
+    <h3>Enhanced Tips <span class="badge badge-enhanced">Enhanced</span></h3>
+    <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">Went from 5 generic tips to 9 specific, actionable tips:</p>
+    <pre><span class="diff-add">- CSS variables first — search for :root { or [data-theme] blocks</span>
+<span class="diff-add">- Font loading tags — look for Google Fonts &lt;link&gt; or @font-face</span>
+<span class="diff-add">- Computed values matter — record actual px, em, rem values</span>
+<span class="diff-add">- Background ≠ white by default — verify the actual background-color</span>
+<span class="diff-add">    Many sites use off-whites like #FAFAFA, #F8F9FA, #FFFDF5</span>
+<span class="diff-add">- Heading color ≠ body color — check &lt;h1&gt; and &lt;p&gt; separately</span>
+<span class="diff-add">- Letter-spacing is often negative on display text (-0.01em to -0.04em)</span>
+<span class="diff-add">- Classify the imagery — photography? illustration? 3D renders?</span>
+<span class="diff-add">- Note what's absent — no stock photos = deliberate choice → mood.avoid</span>
+<span class="diff-add">- Capture the feel — weave colors, typography, imagery, motion together</span></pre>
+  </div>
+</section>
+
+<!-- Template -->
+<section id="template">
+  <div class="section-label">full.visual-style.md</div>
+  <div class="section-title">Updated Full Template</div>
+  <div class="section-desc">
+    The template that new style files are generated from now includes all new fields.
+  </div>
+
+  <div class="filepath">skills/visual-style/references/templates/full.visual-style.md</div>
+
+  <div class="card">
+    <h3>Typography with New Fields <span class="badge badge-changed">Changed</span></h3>
+    <pre><span class="diff-context">typography:</span>
+<span class="diff-context">  display:</span>
+<span class="diff-context">    family: "Font Family Name"</span>
+<span class="diff-context">    weight: "bold"</span>
+<span class="diff-context">    style: "uppercase, tight tracking"</span>
+<span class="diff-add">    size: "48px"</span>
+<span class="diff-add">    line_height: "1.1"</span>
+<span class="diff-add">    letter_spacing: "-0.02em"</span>
+<span class="diff-context">  body:</span>
+<span class="diff-context">    family: "Font Family Name"</span>
+<span class="diff-context">    weight: "regular"</span>
+<span class="diff-context">    style: "sentence case, comfortable line height"</span>
+<span class="diff-add">    size: "16px"</span>
+<span class="diff-add">    line_height: "1.6"</span>
+<span class="diff-add">    letter_spacing: "normal"</span>
+<span class="diff-context">  caption:</span>
+<span class="diff-context">    family: "Font Family Name"</span>
+<span class="diff-context">    weight: "medium"</span>
+<span class="diff-context">    style: "small, uppercase for labels"</span>
+<span class="diff-add">    size: "12px"</span>
+<span class="diff-add">    line_height: "1.4"</span>
+<span class="diff-add">    letter_spacing: "0.05em"</span>
+<span class="diff-context">  rules:</span>
+<span class="diff-add">    - "Type scale: 48px → 32px → 24px → 16px → 12px"</span>
+<span class="diff-context">    - "Typography rule or constraint"</span>
+<span class="diff-remove">    - "Another typography guideline"</span>
+<span class="diff-context">    - "Font usage restriction"</span></pre>
+  </div>
+
+  <div class="card">
+    <h3>New Imagery Section in Template <span class="badge badge-new">New</span></h3>
+    <pre><span class="diff-add">imagery:</span>
+<span class="diff-add">  style: "photographic | illustrated | 3d-rendered | sketch | abstract-geometric | collage | icon-driven"</span>
+<span class="diff-add">  treatment: "how images are cropped, filtered, masked, or framed"</span>
+<span class="diff-add">  subjects:</span>
+<span class="diff-add">    - "common subject matter"</span>
+<span class="diff-add">    - "another subject type"</span>
+<span class="diff-add">  notes:</span>
+<span class="diff-add">    - "observation about visual content"</span>
+<span class="diff-add">    - "what imagery is deliberately absent"</span></pre>
+  </div>
+</section>
+
+<!-- SKILL.md -->
+<section id="skill">
+  <div class="section-label">SKILL.md</div>
+  <div class="section-title">Updated Extract Workflow</div>
+  <div class="section-desc">
+    The top-level skill manifest now reflects the enhanced extraction process.
+  </div>
+
+  <div class="filepath">skills/visual-style/SKILL.md</div>
+
+  <div class="card">
+    <h3>Extract Steps: Before vs After <span class="badge badge-changed">Changed</span></h3>
+    <div class="compare">
+      <div class="compare-before">
+        <div class="compare-label">Before (5 steps)</div>
+        <pre><span class="diff-remove">1. Receive source</span>
+<span class="diff-remove">2. Load extractor</span>
+<span class="diff-remove">3. Analyze — Identify colors, typography,</span>
+<span class="diff-remove">   layout, motion, mood</span>
+<span class="diff-remove">4. Generate — Output visual-style.md</span>
+<span class="diff-remove">   with source_url set</span>
+<span class="diff-remove">5. Validate — Ensure all required</span>
+<span class="diff-remove">   fields are present</span></pre>
+      </div>
+      <div class="compare-after">
+        <div class="compare-label">After (6 steps)</div>
+        <pre><span class="diff-add">1. Receive source</span>
+<span class="diff-add">2. Load extractor</span>
+<span class="diff-add">3. Extract raw values — Pull exact CSS hex</span>
+<span class="diff-add">   codes, font-family names, font-size/</span>
+<span class="diff-add">   line-height/letter-spacing values</span>
+<span class="diff-add">4. Analyze deeply — Map to colors, typography</span>
+<span class="diff-add">   (with precise values), imagery style,</span>
+<span class="diff-add">   layout, motion, mood</span>
+<span class="diff-add">5. Generate — With exact values and</span>
+<span class="diff-add">   imagery section</span>
+<span class="diff-add">6. Validate — Colors are exact hex,</span>
+<span class="diff-add">   typography includes measured values</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Example Output -->
+<section id="example">
+  <div class="section-label">from-website.md</div>
+  <div class="section-title">Updated Stripe Example</div>
+  <div class="section-desc">
+    The example extraction output now demonstrates all new capabilities: precise typography values, imagery classification, and sourced extraction notes.
+  </div>
+
+  <div class="filepath">skills/visual-style/references/extractors/from-website.md</div>
+
+  <div class="card">
+    <h3>style_prompt_full: Before vs After <span class="badge badge-enhanced">Enhanced</span></h3>
+    <div class="compare">
+      <div class="compare-before">
+        <div class="compare-label">Before (vague)</div>
+        <pre><span class="diff-remove">Modern fintech design inspired by Stripe.</span>
+<span class="diff-remove">Clean white backgrounds with generous</span>
+<span class="diff-remove">whitespace. Deep purple (#635BFF) as the</span>
+<span class="diff-remove">primary accent color. Typography uses a</span>
+<span class="diff-remove">custom geometric sans-serif (similar to</span>
+<span class="diff-remove">Inter or Söhne) with clear hierarchy.</span>
+<span class="diff-remove">Subtle mesh gradients in backgrounds.</span>
+<span class="diff-remove">Rounded corners on cards and buttons.</span>
+<span class="diff-remove">Smooth, subtle animations on scroll.</span>
+<span class="diff-remove">Professional, trustworthy, approachable.</span>
+<span class="diff-remove">No harsh colors, no busy patterns,</span>
+<span class="diff-remove">no stock photos.</span></pre>
+      </div>
+      <div class="compare-after">
+        <div class="compare-label">After (precise values)</div>
+        <pre><span class="diff-add">Modern fintech design inspired by Stripe.</span>
+<span class="diff-add">Clean white (#FFFFFF) backgrounds with</span>
+<span class="diff-add">generous whitespace. Deep purple (#635BFF)</span>
+<span class="diff-add">as the primary accent. Dark slate (#0A2540)</span>
+<span class="diff-add">for headings, lighter slate (#425466) for</span>
+<span class="diff-add">body text. Pale gray (#F6F9FC) for section</span>
+<span class="diff-add">backgrounds. Typography uses Söhne (or Inter)</span>
+<span class="diff-add">— display at 600 weight with tight -0.02em</span>
+<span class="diff-add">tracking, body at 400 weight with 1.6 line</span>
+<span class="diff-add">height. Type scale: 64px → 48px → 32px →</span>
+<span class="diff-add">24px → 16px. Mesh gradients purple to cyan</span>
+<span class="diff-add">(#00D4FF). Rounded 12px corners. Smooth 0.2s</span>
+<span class="diff-add">ease transitions. Imagery is product UI</span>
+<span class="diff-add">screenshots and custom abstract gradient art</span>
+<span class="diff-add">— no stock photography.</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Typography with Exact Values <span class="badge badge-enhanced">Enhanced</span></h3>
+    <pre><span class="diff-context">typography:</span>
+<span class="diff-context">  display:</span>
+<span class="diff-remove">    family: "Söhne, Inter, system-ui"</span>
+<span class="diff-add">    family: "Söhne, Inter, system-ui, sans-serif"</span>
+<span class="diff-context">    weight: "600"</span>
+<span class="diff-context">    style: "sentence case, tight tracking"</span>
+<span class="diff-add">    size: "64px"</span>
+<span class="diff-add">    line_height: "1.1"</span>
+<span class="diff-add">    letter_spacing: "-0.02em"</span>
+<span class="diff-context">  body:</span>
+<span class="diff-remove">    family: "Söhne, Inter, system-ui"</span>
+<span class="diff-add">    family: "Söhne, Inter, system-ui, sans-serif"</span>
+<span class="diff-context">    weight: "400"</span>
+<span class="diff-remove">    style: "generous line height, comfortable reading"</span>
+<span class="diff-add">    style: "sentence case, generous line height for readability"</span>
+<span class="diff-add">    size: "16px"</span>
+<span class="diff-add">    line_height: "1.6"</span>
+<span class="diff-add">    letter_spacing: "normal"</span>
+<span class="diff-context">  caption:</span>
+<span class="diff-context">    family: "Söhne Mono, monospace"</span>
+<span class="diff-context">    weight: "400"</span>
+<span class="diff-context">    style: "code blocks, technical details"</span>
+<span class="diff-add">    size: "14px"</span>
+<span class="diff-add">    line_height: "1.5"</span>
+<span class="diff-add">    letter_spacing: "normal"</span></pre>
+  </div>
+
+  <div class="card">
+    <h3>New Imagery Section in Example <span class="badge badge-new">New</span></h3>
+    <pre><span class="diff-add">imagery:</span>
+<span class="diff-add">  style: "photographic with abstract gradient art"</span>
+<span class="diff-add">  treatment: "product screenshots in browser frames, mesh gradients</span>
+<span class="diff-add">             as hero backgrounds, rounded 12px corners"</span>
+<span class="diff-add">  subjects:</span>
+<span class="diff-add">    - "product UI / dashboard screenshots"</span>
+<span class="diff-add">    - "abstract mesh gradient backgrounds (purple → cyan)"</span>
+<span class="diff-add">    - "code snippets in dark terminal frames"</span>
+<span class="diff-add">  notes:</span>
+<span class="diff-add">    - "No stock photography — all custom product shots or abstract art"</span>
+<span class="diff-add">    - "Gradients are mesh/organic, never linear bands"</span>
+<span class="diff-add">    - "Screenshots always shown in realistic device/browser frames"</span></pre>
+  </div>
+
+  <div class="card">
+    <h3>Extraction Notes: Before vs After <span class="badge badge-enhanced">Enhanced</span></h3>
+    <div class="compare">
+      <div class="compare-before">
+        <div class="compare-label">Before (no sources)</div>
+        <pre><span class="diff-remove">Extracted from https://stripe.com on 2026-03-12.</span>
+<span class="diff-remove">Primary purple sampled from CTA buttons.</span>
+<span class="diff-remove">Typography stack identified via browser dev tools.</span>
+<span class="diff-remove">Mesh gradient patterns noted in hero sections.</span></pre>
+      </div>
+      <div class="compare-after">
+        <div class="compare-label">After (every value sourced)</div>
+        <pre><span class="diff-add">Extracted from https://stripe.com on 2026-03-12.</span>
+<span class="diff-add">Background #FFFFFF from body background-color.</span>
+<span class="diff-add">Text #0A2540 from h1/h2 color property.</span>
+<span class="diff-add">Body text #425466 from p color.</span>
+<span class="diff-add">Purple #635BFF from .btn-primary background-color.</span>
+<span class="diff-add">Typography from Google Fonts: Söhne at 400, 600.</span>
+<span class="diff-add">Gradients #635BFF → #00D4FF from hero section.</span>
+<span class="diff-add">Type scale h1 (64px) through body (16px).</span>
+<span class="diff-add">Letter-spacing -0.02em on h1, normal on body.</span>
+<span class="diff-add">Line-height 1.1 on display, 1.6 on body.</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  4 files changed &middot; +319 / -116 &middot; Branch: <code>claude/fix-style-extraction-xkoVC</code>
+</footer>
+
+</body>
+</html>
