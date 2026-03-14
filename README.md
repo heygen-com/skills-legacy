@@ -13,6 +13,7 @@ A collection of skills for working with the HeyGen AI video creation API, design
 | [visual-style](skills/visual-style) | Create, extract, and apply portable visual design systems (`visual-style.md`) across HeyGen, slides, Figma, and more |
 | [video-download](skills/video-download) | Download video and audio from YouTube and 1000+ sites using yt-dlp |
 | [video-edit](skills/video-edit) | Edit videos locally using ffmpeg — trim, concat, resize, speed, overlay, extract audio, compress, and convert |
+| [video-understand](skills/video-understand) | Understand video content locally using ffmpeg frame extraction and Whisper transcription — no API keys needed |
 | [heygen](skills/heygen) | *(Deprecated)* Legacy combined skill — use `create-video` or `avatar-video` instead |
 
 ## Installation
@@ -87,6 +88,8 @@ The skills should appear when Claude Code loads. You can verify by asking Claude
 | Trim, resize, or compress a video | `video-edit` |
 | Concatenate video clips | `video-edit` |
 | Extract or replace audio in a video | `video-edit` |
+| Understand / transcribe a local video | `video-understand` |
+| Extract key frames from a video | `video-understand` |
 
 ## Example Prompts
 
