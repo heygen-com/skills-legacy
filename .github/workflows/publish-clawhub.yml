@@ -77,6 +77,15 @@ jobs:
             --tags latest,video,yt-dlp,download,youtube,audio,local \
             --changelog "Auto-publish from commit ${{ github.sha }}"
 
+      - name: Publish ai-video-gen skill
+        run: |
+          clawhub publish ./skills/ai-video-gen \
+            --slug ai-video-gen-heygen \
+            --name "AI Video Gen" \
+            --version 2.${{ github.run_number }}.0 \
+            --tags latest,video,heygen,ai,generation,text-to-video,veo,kling,sora,runway,workflow-gateway \
+            --changelog "Auto-publish from commit ${{ github.sha }}"
+
       - name: Publish video-edit skill
         run: |
           clawhub publish ./skills/video-edit \
@@ -93,4 +102,13 @@ jobs:
             --name "Video Understand" \
             --version 2.${{ github.run_number }}.0 \
             --tags latest,video,ffmpeg,whisper,transcription,frame-extraction,local,offline \
+            --changelog "Auto-publish from commit ${{ github.sha }}"
+
+      - name: Publish faceswap skill
+        run: |
+          clawhub publish ./skills/faceswap \
+            --slug faceswap-heygen \
+            --name "Faceswap" \
+            --version 2.${{ github.run_number }}.0 \
+            --tags latest,faceswap,heygen,face,swap,video,gpu,workflow-gateway \
             --changelog "Auto-publish from commit ${{ github.sha }}"

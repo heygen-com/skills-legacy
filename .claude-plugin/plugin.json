@@ -19,6 +19,9 @@
     "text-to-video",
     "talking-head",
     "visual-style",
-    "design-system"
+    "design-system",
+    "video-generation",
+    "faceswap",
+    "workflow-gateway"
   ]
 }
