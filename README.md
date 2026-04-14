@@ -1,32 +1,35 @@
-# HeyGen Skills (Legacy Archive)
+# HeyGen Skills (v1 — Archived)
 
-> **This repo is archived.** The active HeyGen skills have moved to [heygen-com/skills](https://github.com/heygen-com/skills).
+> **Looking for the current HeyGen Skills?** Go to [heygen-com/skills](https://github.com/heygen-com/skills).
 >
-> Install the current version:
-> ```bash
+> ```
 > git clone https://github.com/heygen-com/skills.git
 > ```
 
-This repository preserves the original v1 HeyGen skills for reference. It is no longer maintained and will not receive updates.
+This repository preserves the original v1 HeyGen skills for reference. It is no longer maintained.
 
-The new [HeyGen Stack](https://github.com/heygen-com/skills) replaces all skills in this repo with two chained skills — **heygen-avatar** (identity + voice) and **heygen-video** (script + video production) — built on the v3 API with encoded best practices from 80+ test videos.
+The current [HeyGen Skills](https://github.com/heygen-com/skills) replaces this repo with two purpose-built skills — **heygen-avatar** and **heygen-video** — powered by the v3 API with best practices from 80+ production test videos.
 
 ---
 
 ## What Was Here
 
-| Skill | Description | Replaced By |
-|-------|-------------|-------------|
-| create-video | Prompt-based video creation (Video Agent) | heygen-video |
-| avatar-video | Precise avatar/scene video control | heygen-avatar + heygen-video |
-| text-to-speech | Standalone TTS audio | — (not yet in new stack) |
-| video-translate | Video translation & dubbing | — (not yet in new stack) |
-| ai-video-gen | AI video generation (VEO, Kling, Sora) | — (not yet in new stack) |
-| faceswap | Face swap in videos | — (not yet in new stack) |
-| visual-style | Portable visual design systems | — (not yet in new stack) |
-| video-download | Download video/audio (yt-dlp) | — (not yet in new stack) |
-| video-edit | Local video editing (ffmpeg) | — (not yet in new stack) |
-| video-understand | Local video understanding | — (not yet in new stack) |
+These v1 skills were individual API wrappers — each mapped to a HeyGen endpoint or local tool:
+
+| Skill | What it did |
+|-------|-------------|
+| create-video | Prompt-based video creation via Video Agent |
+| avatar-video | Precise avatar/scene video control |
+| text-to-speech | Standalone TTS audio generation |
+| video-translate | Video translation and dubbing |
+| ai-video-gen | AI video generation (VEO, Kling, Sora, Runway) |
+| faceswap | Face swap in videos |
+| visual-style | Portable visual design systems |
+| video-download | Download video/audio from URLs (yt-dlp) |
+| video-edit | Local video editing (ffmpeg) |
+| video-understand | Local video understanding (ffmpeg + Whisper) |
+
+The new skills take a different approach — instead of wrapping individual endpoints, they encode the full production workflow: discovery, scripting, prompt engineering, frame correction, and delivery.
 
 ## License
 
